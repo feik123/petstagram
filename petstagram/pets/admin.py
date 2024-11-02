@@ -1,5 +1,6 @@
-# from django.contrib import admin
-# from petstagram.pets.models import Pets
-# @admin.register(Pet)
-# class PetAdmin(admin.ModelAdmin):
-#     pass
+from django.contrib import admin
+from petstagram.pets.models import Pet
+
+@admin.register(Pet)
+class PetAdmin(admin.ModelAdmin):
+    list_display = ('name', 'slug')
