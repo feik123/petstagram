@@ -6,7 +6,7 @@ class Pet(models.Model):
     name = models.CharField(
         max_length=30,
     )
-    pet_photo = models.URLField()
+    personal_photo = models.URLField()
     date_of_birth = models.DateField(
         blank=True,
         null=True,
