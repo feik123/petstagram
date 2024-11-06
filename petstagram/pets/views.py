@@ -10,11 +10,13 @@ def pet_add_page(request):
     if request.method == 'POST':
         if form.is_valid():
             form.save()
-            return redirect('profile-details')
+            return redirect('profile-details', pk=1)
 
+    context = {
+        'form': form,
+    }
 
-
-    return render(request, 'pets/pet-add-page.html')
+    return render(request, 'pets/pet-add-page.html', context)
 
 def pet_delete_page(request, username, pet_slug):
     return render(request, 'pets/pet-delete-page.html')
