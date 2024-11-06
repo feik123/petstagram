@@ -1,9 +1,19 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
+from petstagram.pets.forms import PetAddForm
 from petstagram.pets.models import Pet
 
 
 def pet_add_page(request):
+    form = PetAddForm(request.POST or None)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            form.save()
+            return redirect('profile-details')
+
+
+
     return render(request, 'pets/pet-add-page.html')
 
 def pet_delete_page(request, username, pet_slug):
