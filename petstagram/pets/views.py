@@ -16,4 +16,9 @@ def pet_details_page(request, username, pet_slug):
     pet = Pet.objects.get(slug=pet_slug)
     all_photos = pet.photo_set.all()
 
-    return render(request, 'pets/pet-details-page.html')
+    context = {
+        'pet': pet,
+        'all_photos': all_photos,
+    }
+
+    return render(request, 'pets/pet-details-page.html', context=context)
