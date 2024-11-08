@@ -2,6 +2,7 @@ from lib2to3.fixes.fix_input import context
 
 from django.shortcuts import render, redirect
 
+from petstagram.common.forms import CommentForm
 from petstagram.pets.forms import PetAddForm, PetEditForm, PetDeleteForm
 from petstagram.pets.models import Pet
 
@@ -57,10 +58,12 @@ def pet_edit_page(request, username, pet_slug):
 def pet_details_page(request, username, pet_slug):
     pet = Pet.objects.get(slug=pet_slug)
     all_photos = pet.photo_set.all()
+    comment_form = CommentForm()
 
     context = {
         'pet': pet,
         'all_photos': all_photos,
+        'comment_form': comment_form,
     }
 
     return render(request, 'pets/pet-details-page.html', context=context)

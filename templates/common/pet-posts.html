@@ -36,8 +36,9 @@
                             <img class="edit-img" src="{% static '/images/edit-pen-icon-6.jpg' %}" alt="edit button">
                         </a>
                         <!-- Link to Delete Pet Photo Page -->
-                        <a href="#"> <img class="bin-img" src="{% static '/images/icon-remove-22.jpg' %}"
-                                          alt="bin button">
+                        <a href="{% url 'photo-delete' photo.pk %}"> 
+                            <img class="bin-img" src="{% static '/images/icon-remove-22.jpg' %}" 
+                                 alt="bin button">
                         </a>
                     </div>
                     <!-- End IF the viewer is the creator of the photo -->
@@ -91,7 +92,7 @@
             </a>
 
         {% else %}
-            <div href="{% url 'photo-details' photo.pk %}">
+            <a href="{% url 'photo-details' photo.pk %}">
             <h4 class="details">See details</h4>
         {% endif %}
 
@@ -129,15 +130,15 @@
         <!-- add comments section -->
         <div class="addComments">
 
-            <form method="post" action="add comment">
-                <label for="id_body">Body:</label>
-                <textarea name="body" cols="40" rows="10" placeholder="Add comment..." maxlength="300"
-                          required="" id="id_body"></textarea>
+            <form method="post" action="{% url 'comment' photo.pk %}">
+                {% csrf_token %}
+                {{ comment_form }}    
+                
                 <button type="submit">Post</button>
             </form>
         </div>
         <!--  -->
-        </div>
+        </a>
     </div>
 </div>
 <!-- End  First Pet Photo Post -->
