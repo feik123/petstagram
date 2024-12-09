@@ -24,7 +24,7 @@
             <h3>
                 <a href="{% url 'profile-details' photo.user.pk %}">
                     <!-- if user has first name and last name -->
-                    {{ photo.user.profile.get_full_name}}
+                    {{ photo.user.profile.get_full_name }}
                     <!-- else -->
                     <!-- user username -->
                 </a>
@@ -36,17 +36,20 @@
 
                 {% if photo_page %}
                     <!-- IF the viewer is the creator of the photo -->
-                    <div class="edit-delete-btns">
-                        <!-- Link to Edit Pet Photo` Page `-->
-                        <a href="{% url 'photo-edit' photo.pk %}">
-                            <img class="edit-img" src="{% static '/images/edit-pen-icon-6.jpg' %}" alt="edit button">
-                        </a>
-                        <!-- Link to Delete Pet Photo Page -->
-                        <a href="{% url 'photo-delete' photo.pk %}">
-                            <img class="bin-img" src="{% static '/images/icon-remove-22.jpg' %}"
-                                 alt="bin button">
-                        </a>
-                    </div>
+                    {% if photo.user.pk == request.user.pk %}
+                        <div class="edit-delete-btns">
+                            <!-- Link to Edit Pet Photo` Page `-->
+                            <a href="{% url 'photo-edit' photo.pk %}">
+                                <img class="edit-img" src="{% static '/images/edit-pen-icon-6.jpg' %}"
+                                     alt="edit button">
+                            </a>
+                            <!-- Link to Delete Pet Photo Page -->
+                            <a href="{% url 'photo-delete' photo.pk %}">
+                                <img class="bin-img" src="{% static '/images/icon-remove-22.jpg' %}"
+                                     alt="bin button">
+                            </a>
+                        </div>
+                    {% endif %}
                     <!-- End IF the viewer is the creator of the photo -->
                 {% endif %}
             </h3>
