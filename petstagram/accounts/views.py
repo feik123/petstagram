@@ -2,7 +2,6 @@ from django.contrib.auth import get_user_model, login, logout
 from django.contrib.auth.views import LoginView, LogoutView
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
-from django.views import View
 from django.views.generic import CreateView, UpdateView
 
 from petstagram.accounts.forms import AppUserCreationForm, ProfileEditForm

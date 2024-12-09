@@ -16,6 +16,12 @@ class PhotoAddPage(CreateView):
     template_name = 'photos/photo-add-page.html'
     success_url = reverse_lazy('home')
 
+    def form_valid(self, form):
+        photo = form.save(commit=False)
+        photo.user = self.request.user
+
+        return super().form_valid(form)
+
 # def photo_add_page(request):
 #     form = PhotoAddForm(request.POST or None, request.FILES or None)
 #     if request.method == 'POST':
