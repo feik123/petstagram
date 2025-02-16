@@ -1,6 +1,8 @@
 from lib2to3.fixes.fix_input import context
 
-from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.shortcuts import render, redirect, get_object_or_404
 from django.template.defaulttags import comment
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DeleteView
@@ -10,7 +12,7 @@ from petstagram.photos.forms import PhotoAddForm, PhotoEditForm, PhotoDeleteForm
 from petstagram.photos.models import Photo
 
 
-class PhotoAddPage(CreateView):
+class PhotoAddPage(LoginRequiredMixin, CreateView):
     model = Photo
     form_class = PhotoAddForm
     template_name = 'photos/photo-add-page.html'
@@ -36,10 +38,14 @@ class PhotoAddPage(CreateView):
 #     return render(request, 'photos/photo-add-page.html', context)
 
 
-class PhotoEditPage(UpdateView):
+class PhotoEditPage(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Photo
     form_class = PhotoEditForm
     template_name = 'photos/photo-edit-page.html'
+
+    def test_func(self):
+        photo = get_object_or_404(Photo, self.kwargs['pk'])
+        return self.request.user == photo.user
 
     def get_success_url(self,):
         return reverse_lazy('photo-details', kwargs={'pk': self.object.pk})
@@ -60,7 +66,7 @@ class PhotoEditPage(UpdateView):
 #
 #     return render(request, 'photos/photo-edit-page.html', context)
 
-class PhotoDetailsPage(DeleteView):
+class PhotoDetailsPage(LoginRequiredMixin, DeleteView):
     model = Photo
     form_class = PhotoDeleteForm
     template_name = 'photos/photo-details-page.html'
@@ -73,6 +79,7 @@ class PhotoDetailsPage(DeleteView):
         context['likes'] = self.object.like_set.all()
         context['comments'] = self.object.comment_set.all()
         context['comment_form'] = CommentForm()
+        self.object.has_liked = self.object.like_set.filter(user=self.request.user).exists()
 
         return context
 
@@ -92,7 +99,11 @@ class PhotoDetailsPage(DeleteView):
     #
     #     return render(request, 'photos/photo-details-page.html', context=context)
 
-
+@login_required
 def photo_delete_page(request, pk:int):
-    Photo.objects.get(pk=pk).delete()
+    photo = Photo.objects.get(pk=pk)
+
+    if request.user == photo.user:
+        photo.delete()
+
     return redirect('home')

@@ -1,3 +1,4 @@
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, resolve_url
 from django.views.generic import ListView
 from pyperclip import copy
@@ -18,6 +19,11 @@ class HomePage(ListView):
 
         context['comment_form'] = CommentForm()
         context['search_form'] = SearchForm(self.request.GET)
+
+        user = self.request.user
+
+        for photo in context['all_photos']:
+            photo.has_liked = photo.like_set.filter(user=user).exists() if user.is_authenticated else False
 
         return context
 
@@ -56,9 +62,11 @@ class HomePage(ListView):
 #
 #     return render(request, 'common/home-page.html', context=context)
 
+@login_required
 def likes_functionality(request, photo_id: int):
     liked_object = Like.objects.filter(
-        to_photo_id=photo_id
+        to_photo_id=photo_id,
+        user = request.user,
     ).first()
 
     if liked_object:
@@ -76,7 +84,7 @@ def share_functionality(request, photo_id: int):
 
     return redirect(request.META.get('HTTP_REFERER') + f'#{photo_id}')
 
-
+@login_required
 def comment_functionality(request, photo_id: int):
     if request.method == "POST":
         photo = Photo.objects.get(id=photo_id)

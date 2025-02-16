@@ -1,9 +1,10 @@
 from django.contrib.auth import get_user_model, login, logout
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.views import LoginView, LogoutView
 from django.db.models import Count
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, DetailView
+from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
 
 from petstagram.accounts.forms import AppUserCreationForm, ProfileEditForm
 from petstagram.accounts.models import Profile
@@ -23,15 +24,20 @@ class AppUserRegisterView(CreateView):
     def form_valid(self, form):
         response = super().form_valid(form)
 
-        user = form.save()
         login(self.request, self.object)
 
         return response
 
-def profile_delete(request, pk:int):
-    return render(request, 'accounts/profile-delete-page.html')
+class ProfileDeletePage(LoginRequiredMixin, UserPassesTestMixin ,DeleteView):
+    model = Profile
+    template_name = 'accounts/profile-delete-page.html'
+    success_url = reverse_lazy('login')
 
-class ProfileDetailView(DetailView):
+    def test_func(self):
+        profile = get_object_or_404(Profile, self.kwargs['pk'])
+        return self.request.user == profile.user
+
+class ProfileDetailView(LoginRequiredMixin,DetailView):
     model = UserModel
     template_name = 'accounts/profile-details-page.html'
 
@@ -46,13 +52,18 @@ class ProfileDetailView(DetailView):
 
         return context
 
-class ProfileEditView(UpdateView):
+class ProfileEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Profile
     form_class = ProfileEditForm
     template_name = 'accounts/profile-edit-page.html'
+
+    def test_func(self):
+        profile = get_object_or_404(Profile, pk=self.kwargs['pk'])
+        return self.request.user == profile.user
 
     def get_success_url(self):
         return reverse_lazy(
             'profile-details',
             kwargs={'pk': self.object.pk}
         )
+
